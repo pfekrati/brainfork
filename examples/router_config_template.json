@@ -1,0 +1,98 @@
+{
+  "models": {
+    "gpt-4o-mini": {
+      "endpoint": "${AZURE_OPENAI_ENDPOINT}",
+      "deployment_name": "gpt-4o-mini",
+      "api_version": "2024-02-01",
+      "auth": {
+        "api_key": "${AZURE_OPENAI_API_KEY}"
+      },
+      "model_type": "chat",
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "o1-mini": {
+      "endpoint": "${AZURE_OPENAI_ENDPOINT}",
+      "deployment_name": "o1-mini",
+      "api_version": "2024-02-01",
+      "auth": {
+        "api_key": "${AZURE_OPENAI_API_KEY}"
+      },
+      "model_type": "chat"
+    },
+    "gpt-4": {
+      "endpoint": "${AZURE_OPENAI_ENDPOINT}",
+      "deployment_name": "gpt-4",
+      "api_version": "2024-02-01",
+      "auth": {
+        "client_id": "${AZURE_CLIENT_ID}",
+        "client_secret": "${AZURE_CLIENT_SECRET}",
+        "tenant_id": "${AZURE_TENANT_ID}"
+      },
+      "model_type": "chat"
+    },
+    "gpt-4-managed-identity": {
+      "endpoint": "${AZURE_OPENAI_ENDPOINT}",
+      "deployment_name": "gpt-4",
+      "api_version": "2024-02-01",
+      "auth": {
+        "use_managed_identity": true
+      },
+      "model_type": "chat"
+    }
+  },
+  "use_cases": [
+    {
+      "name": "text_classification",
+      "description": "Text classification, sentiment analysis, and simple categorization tasks",
+      "model_name": "gpt-4o-mini",
+      "priority": 1,
+      "keywords": ["classify", "categorize", "sentiment", "label", "tag"],
+      "context_requirements": ["simple_task"],
+      "min_confidence": 0.7
+    },
+    {
+      "name": "advanced_reasoning",
+      "description": "Complex reasoning, mathematical problems, and analytical tasks requiring deep thinking",
+      "model_name": "o1-mini",
+      "priority": 2,
+      "keywords": ["math", "reasoning", "analysis", "problem", "solve", "calculate", "equation", "proof"],
+      "context_requirements": ["complex_reasoning", "mathematical"],
+      "min_confidence": 0.8
+    },
+    {
+      "name": "code_generation",
+      "description": "Code generation, programming assistance, and technical documentation",
+      "model_name": "gpt-4",
+      "priority": 2,
+      "keywords": ["code", "programming", "function", "class", "debug", "implement", "algorithm", "software"],
+      "context_requirements": ["technical", "development"],
+      "min_confidence": 0.75
+    },
+    {
+      "name": "creative_writing",
+      "description": "Creative writing, storytelling, and content generation",
+      "model_name": "gpt-4",
+      "priority": 3,
+      "keywords": ["write", "story", "creative", "content", "article", "blog"],
+      "context_requirements": ["creative"],
+      "min_confidence": 0.7
+    },
+    {
+      "name": "data_analysis",
+      "description": "Data analysis, statistical interpretation, and insights generation",
+      "model_name": "gpt-4",
+      "priority": 2,
+      "keywords": ["data", "analysis", "statistics", "insights", "trends", "visualization"],
+      "context_requirements": ["analytical", "data"],
+      "min_confidence": 0.75
+    }
+  ],
+  "router_settings": {
+    "default_model": "gpt-4o-mini",
+    "routing_model": "gpt-4o-mini",
+    "routing_temperature": 0.1,
+    "enable_caching": true,
+    "client_type": "openai"
+  }
+}
