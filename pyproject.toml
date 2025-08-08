@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Intelligent AI model routing for Azure AI Foundry based on use cases and conversation context"
 readme = "README.md"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"},
+    {name = "Pooyan Fekrati", email = "p.fekrati@hotmail.com"},
 ]
 license = {text = "MIT"}
 classifiers = [
@@ -42,9 +42,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/brainfork"
-Repository = "https://github.com/yourusername/brainfork"
-Issues = "https://github.com/yourusername/brainfork/issues"
+Homepage = "https://github.com/pfekrati/brainfork"
+Repository = "https://github.com/pfekrati/brainfork"
+Issues = "https://github.com/pfekrati/brainfork/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

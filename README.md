@@ -71,9 +71,9 @@ result = await router.route_conversation(messages)
 print(f"Selected model: {result.model_name}")
 
 # Get configured client
-client = result.get_client()
-response = await client.chat.completions.create(
-    model=result.deployment_name,
+configured_client = await router.get_configured_client(messages)
+response = await configured_client.client.chat.completions.create(
+    model=configured_client.model_config.deployment_name,
     messages=messages
 )
 ```
