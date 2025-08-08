@@ -108,7 +108,7 @@ class RoutingEngine:
         use_case_descriptions = []
         for uc in use_cases:
             description = f"""
-**{uc.name}** (Model: {uc.model_name}, Priority: {uc.priority})
+**{uc.name}** (Model: {uc.model_name})
 - Description: {uc.description}
 - Keywords: {', '.join(uc.keywords) if uc.keywords else 'None'}
 - Context Requirements: {', '.join(uc.context_requirements) if uc.context_requirements else 'None'}

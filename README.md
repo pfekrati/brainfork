@@ -43,14 +43,12 @@ use_cases = [
     UseCase(
         name="text_classification",
         description="Text classification and sentiment analysis tasks",
-        model_name="gpt-4o-mini",
-        priority=1
+        model_name="gpt-4o-mini"
     ),
     UseCase(
         name="advanced_reasoning", 
         description="Complex reasoning, math, and analytical tasks",
-        model_name="o1-mini",
-        priority=2
+        model_name="o1-mini"
     )
 ]
 
@@ -107,7 +105,6 @@ use_case = UseCase(
     name="code_generation",
     description="Code generation and programming tasks",
     model_name="gpt-4o",
-    priority=1,
     keywords=["code", "programming", "function", "class"],
     context_requirements=["technical", "development"]
 )
@@ -118,8 +115,7 @@ router = ModelRouter(
     use_cases=use_cases,
     default_model="gpt-4o-mini",
     routing_model="gpt-4o-mini",
-    routing_temperature=0.1,
-    enable_caching=True
+    routing_temperature=0.1
 )
 ```
 

@@ -241,7 +241,6 @@ class ModelRouter:
                     "name": uc.name,
                     "description": uc.description,
                     "model_name": uc.model_name,
-                    "priority": uc.priority,
                     "keywords": uc.keywords,
                     "min_confidence": uc.min_confidence
                 }

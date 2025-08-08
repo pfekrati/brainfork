@@ -3,7 +3,7 @@ Data models for Azure AI Router configuration
 """
 
 from typing import Dict, List, Optional, Any, Union
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 
 
@@ -23,7 +23,8 @@ class AuthConfig(BaseModel):
     tenant_id: Optional[str] = None
     use_managed_identity: bool = False
     
-    @validator('api_key', 'client_id', 'client_secret', 'tenant_id')
+    @field_validator('api_key', 'client_id', 'client_secret', 'tenant_id')
+    @classmethod
     def validate_strings(cls, v):
         if v is not None and not isinstance(v, str):
             raise ValueError("Must be a string")
@@ -52,13 +53,15 @@ class ModelConfig(BaseModel):
     max_tokens: Optional[int] = Field(default=None, description="Maximum tokens for this model")
     temperature: Optional[float] = Field(default=None, description="Default temperature")
     
-    @validator('endpoint')
+    @field_validator('endpoint')
+    @classmethod
     def validate_endpoint(cls, v):
         if not v.startswith(('http://', 'https://')):
             raise ValueError("Endpoint must be a valid URL")
         return v
     
-    @validator('temperature')
+    @field_validator('temperature')
+    @classmethod
     def validate_temperature(cls, v):
         if v is not None and not (0.0 <= v <= 1.0):
             raise ValueError("Temperature must be between 0.0 and 1.0")
@@ -71,18 +74,12 @@ class UseCase(BaseModel):
     name: str = Field(..., description="Unique name for the use case")
     description: str = Field(..., description="Description of when to use this model")
     model_name: str = Field(..., description="Name of the model to use for this case")
-    priority: int = Field(default=1, description="Priority level (1=highest)")
     keywords: List[str] = Field(default_factory=list, description="Keywords that trigger this use case")
     context_requirements: List[str] = Field(default_factory=list, description="Context requirements")
     min_confidence: float = Field(default=0.7, description="Minimum confidence score to trigger")
     
-    @validator('priority')
-    def validate_priority(cls, v):
-        if v < 1:
-            raise ValueError("Priority must be 1 or higher")
-        return v
-    
-    @validator('min_confidence')
+    @field_validator('min_confidence')
+    @classmethod
     def validate_confidence(cls, v):
         if not (0.0 <= v <= 1.0):
             raise ValueError("Confidence must be between 0.0 and 1.0")
@@ -130,7 +127,8 @@ class ConversationMessage(BaseModel):
     content: str = Field(..., description="Message content")
     name: Optional[str] = Field(None, description="Optional name for the message sender")
     
-    @validator('role')
+    @field_validator('role')
+    @classmethod
     def validate_role(cls, v):
         if v not in ['user', 'assistant', 'system', 'function', 'tool']:
             raise ValueError("Role must be one of: user, assistant, system, function, tool")
