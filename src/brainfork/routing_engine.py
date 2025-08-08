@@ -3,9 +3,7 @@ Core routing engine that analyzes conversations and selects appropriate models
 """
 
 import json
-import asyncio
 from typing import Dict, List, Optional, Any, Union
-from datetime import datetime
 
 from .models import (
     ModelConfig, 
@@ -16,6 +14,8 @@ from .models import (
 )
 from .client_factory import ClientFactory, ConfiguredClient
 from .exceptions import RoutingError, ModelNotFoundError, ConfigurationError
+import math
+from structured_logprobs import add_logprobs
 
 
 class RoutingEngine:
@@ -25,13 +25,11 @@ class RoutingEngine:
         self,
         routing_model_config: ModelConfig,
         use_cases: List[UseCase],
-        routing_temperature: float = 0.1,
-        enable_caching: bool = True
+        routing_temperature: float = 0.1
     ):
         self.routing_model_config = routing_model_config
         self.use_cases = use_cases
         self.routing_temperature = routing_temperature
-        self.enable_caching = enable_caching
         self._routing_cache: Dict[str, RoutingResult] = {}
     
     async def analyze_conversation(
@@ -62,7 +60,7 @@ class RoutingEngine:
             # Fallback to default model if routing fails
             return RoutingResult(
                 model_name=default_model,
-                model_config=available_models[default_model],
+                selected_model=available_models[default_model],
                 use_case=None,
                 confidence=0.5,
                 reasoning=f"Fallback to default model due to routing error: {str(e)}"
@@ -156,7 +154,7 @@ If no use case clearly matches, respond with "use_case": null and explain why.""
         
         return routing_messages
     
-    async def _get_routing_decision(self, routing_prompt: List[Dict[str, str]]) -> str:
+    async def _get_routing_decision(self, routing_prompt: List[Dict[str, str]]) -> Any:
         """Get routing decision from the AI model"""
         
         try:
@@ -171,12 +169,19 @@ If no use case clearly matches, respond with "use_case": null and explain why.""
                 model=self.routing_model_config.deployment_name,
                 messages=routing_prompt,
                 temperature=self.routing_temperature,
-                max_tokens=500,
+                logprobs=True,
                 response_format={"type": "json_object"}
             )
-            
-            return response.choices[0].message.content
-            
+
+            logprobs = add_logprobs(response)
+
+            data = json.loads(response.choices[0].message.content)
+
+            # Set the confidence value in the data object using logprobs
+            data["confidence"] = math.exp(logprobs.log_probs[0].get("use_case", -100.0))
+
+            return data
+
         except Exception as e:
             raise RoutingError(f"Failed to get routing decision: {str(e)}")
     
@@ -189,8 +194,9 @@ If no use case clearly matches, respond with "use_case": null and explain why.""
         """Parse the routing response and create a RoutingResult"""
         
         try:
-            data = json.loads(response)
-            
+            # data = json.loads(response)
+            data = response
+
             use_case_name = data.get("use_case")
             confidence = float(data.get("confidence", 0.5))
             reasoning = data.get("reasoning", "No reasoning provided")
@@ -219,7 +225,7 @@ If no use case clearly matches, respond with "use_case": null and explain why.""
             
             return RoutingResult(
                 model_name=selected_model,
-                model_config=available_models[selected_model],
+                selected_model=available_models[selected_model],
                 use_case=selected_use_case,
                 confidence=confidence,
                 reasoning=reasoning

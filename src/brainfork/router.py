@@ -26,7 +26,6 @@ class ModelRouter:
         default_model: str,
         routing_model: Optional[str] = None,
         routing_temperature: float = 0.1,
-        enable_caching: bool = True,
         client_type: str = "openai"
     ):
         """
@@ -38,7 +37,6 @@ class ModelRouter:
             default_model: Name of default model to use when no use case matches
             routing_model: Name of model to use for routing decisions (defaults to default_model)
             routing_temperature: Temperature for routing model (lower = more deterministic)
-            enable_caching: Whether to cache routing decisions
             client_type: Type of client to create ("openai" or "inference")
         """
         
@@ -55,8 +53,7 @@ class ModelRouter:
         self.routing_engine = RoutingEngine(
             routing_model_config=self.models[self.routing_model],
             use_cases=use_cases,
-            routing_temperature=routing_temperature,
-            enable_caching=enable_caching
+            routing_temperature=routing_temperature
         )
     
     def _validate_configuration(self) -> None:
@@ -112,7 +109,6 @@ class ModelRouter:
     async def get_configured_client(
         self,
         messages: List[Union[Dict[str, Any], ConversationMessage]],
-        override_model: Optional[str] = None,
         async_client: bool = True
     ) -> ConfiguredClient:
         """
@@ -128,17 +124,17 @@ class ModelRouter:
         """
         
         # Get routing result
-        routing_result = await self.route_conversation(messages, override_model)
+        routing_result = await self.route_conversation(messages)
         
         # Create appropriate client
         if self.client_type.lower() == "openai":
             client = ClientFactory.create_openai_client(
-                routing_result.model_config,
+                routing_result.selected_model,
                 async_client=async_client
             )
         elif self.client_type.lower() == "inference":
             client = ClientFactory.create_inference_client(
-                routing_result.model_config,
+                routing_result.selected_model,
                 async_client=async_client
             )
         else:
@@ -146,7 +142,7 @@ class ModelRouter:
         
         return ConfiguredClient(
             client=client,
-            model_config=routing_result.model_config,
+            model_config=routing_result.selected_model,
             routing_result=routing_result
         )
     
@@ -236,7 +232,6 @@ class ModelRouter:
                     "endpoint": config.endpoint,
                     "deployment_name": config.deployment_name,
                     "api_version": config.api_version,
-                    "model_type": config.model_type,
                     "auth_type": config.auth.auth_type.value
                 }
                 for name, config in self.models.items()

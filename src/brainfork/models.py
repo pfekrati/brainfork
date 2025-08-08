@@ -47,7 +47,7 @@ class ModelConfig(BaseModel):
     
     endpoint: str = Field(..., description="Azure OpenAI endpoint URL")
     deployment_name: str = Field(..., description="Model deployment name")
-    api_version: str = Field(default=None, description="API version")
+    api_version: Optional[str] = Field(default=None, description="API version")
     auth: AuthConfig = Field(..., description="Authentication configuration")
     max_tokens: Optional[int] = Field(default=None, description="Maximum tokens for this model")
     temperature: Optional[float] = Field(default=None, description="Default temperature")
@@ -93,7 +93,7 @@ class RoutingResult(BaseModel):
     """Result of model routing decision"""
     
     model_name: str = Field(..., description="Selected model name")
-    model_config: ModelConfig = Field(..., description="Configuration of selected model")
+    selected_model: ModelConfig = Field(..., description="Configuration of selected model")
     use_case: Optional[UseCase] = Field(None, description="Matched use case")
     confidence: float = Field(..., description="Confidence in routing decision")
     reasoning: str = Field(..., description="Explanation of routing decision")
@@ -101,25 +101,25 @@ class RoutingResult(BaseModel):
     @property
     def endpoint(self) -> str:
         """Get the model endpoint"""
-        return self.model_config.endpoint
+        return self.selected_model.endpoint
     
     @property
     def deployment_name(self) -> str:
         """Get the deployment name"""
-        return self.model_config.deployment_name
+        return self.selected_model.deployment_name
     
     @property
-    def api_version(self) -> str:
+    def api_version(self) -> Optional[str]:
         """Get the API version"""
-        return self.model_config.api_version
+        return self.selected_model.api_version
     
     def get_client_config(self) -> Dict[str, Any]:
         """Get configuration dictionary for creating a client"""
         return {
-            "endpoint": self.model_config.endpoint,
-            "deployment_name": self.model_config.deployment_name,
-            "api_version": self.model_config.api_version,
-            "auth_config": self.model_config.auth,
+            "endpoint": self.selected_model.endpoint,
+            "deployment_name": self.selected_model.deployment_name,
+            "api_version": self.selected_model.api_version,
+            "auth_config": self.selected_model.auth,
         }
 
 

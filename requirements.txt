@@ -5,6 +5,7 @@ openai>=1.12.0
 pydantic>=2.5.0
 typing-extensions>=4.8.0
 httpx>=0.26.0
+structured-logprobs>=0.1.5
 
 # Optional dependencies
 PyYAML>=6.0.0  # For YAML configuration files
