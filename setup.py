@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="brainfork",
-    version="0.1.0",
+    version="0.1.2",
     author="Pooyan",
     author_email="",  # Add your email here
     description="An intelligent AI model router for Azure OpenAI that automatically selects the best model for your specific use case",

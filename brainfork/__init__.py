@@ -8,7 +8,7 @@ conversation context, keywords, and predefined routing rules.
 from .router import ModelRouter
 from .models import ModelConfig, AuthConfig, UseCase, RoutingResult, ConfiguredClient
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __author__ = "Pooyan Fekrati"
 __email__ = "p.fekrati@hotmail.com"
 
