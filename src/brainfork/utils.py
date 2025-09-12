@@ -70,7 +70,7 @@ def parse_models_from_config(config: Dict[str, Any]) -> Dict[str, ModelConfig]:
             use_managed_identity=auth_data.get('use_managed_identity', False)
         )
         
-        model_config = ModelConfig(
+        model_configuration = ModelConfig(
             endpoint=model_data['endpoint'],
             deployment_name=model_data['deployment_name'],
             api_version=model_data.get('api_version', '2024-02-01'),
@@ -80,7 +80,7 @@ def parse_models_from_config(config: Dict[str, Any]) -> Dict[str, ModelConfig]:
             temperature=model_data.get('temperature')
         )
         
-        models[name] = model_config
+        models[name] = model_configuration
     
     return models
 
@@ -209,21 +209,21 @@ def environment_variable_substitution(config: Dict[str, Any]) -> Dict[str, Any]:
     return substitute_value(config)
 
 
-def validate_model_connectivity(model_config: ModelConfig) -> bool:
+def validate_model_connectivity(model_configuration: ModelConfig) -> bool:
     """Test connectivity to a model endpoint (basic validation)"""
     
     try:
         from .client_factory import ClientFactory
         
         # Create a client and test basic connectivity
-        client = ClientFactory.create_openai_client(model_config, async_client=False)
+        client = ClientFactory.create_openai_client(model_configuration, async_client=False)
         
         # Try a simple test call (this might fail but will validate auth/endpoint)
         test_messages = [{"role": "user", "content": "test"}]
         
         try:
             response = client.chat.completions.create(
-                model=model_config.deployment_name,
+                model=model_configuration.deployment_name,
                 messages=test_messages,
                 max_tokens=1
             )

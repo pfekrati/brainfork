@@ -19,17 +19,17 @@ class ClientFactory:
     
     @staticmethod
     def create_openai_client(
-        model_config: ModelConfig, 
+        model_configuration: ModelConfig, 
         async_client: bool = True
     ) -> Union[AsyncAzureOpenAI, AzureOpenAI]:
         """Create an Azure OpenAI client"""
         
-        auth_manager = AuthenticationManager(model_config.auth)
+        auth_manager = AuthenticationManager(model_configuration.auth)
         credential = auth_manager.get_credential()
         
         client_kwargs = {
-            "azure_endpoint": model_config.endpoint,
-            "api_version": model_config.api_version,
+            "azure_endpoint": model_configuration.endpoint,
+            "api_version": model_configuration.api_version,
         }
         
         if isinstance(credential, str):
@@ -48,12 +48,12 @@ class ClientFactory:
     
     @staticmethod
     def create_inference_client(
-        model_config: ModelConfig,
+        model_configuration: ModelConfig,
         async_client: bool = True
     ) -> Union[AsyncChatCompletionsClient, ChatCompletionsClient]:
         """Create an Azure AI Inference client"""
         
-        auth_manager = AuthenticationManager(model_config.auth)
+        auth_manager = AuthenticationManager(model_configuration.auth)
         credential = auth_manager.get_credential()
         
         if isinstance(credential, str):
@@ -66,12 +66,12 @@ class ClientFactory:
         
         if async_client:
             return AsyncChatCompletionsClient(
-                endpoint=model_config.endpoint,
+                endpoint=model_configuration.endpoint,
                 credential=azure_credential
             )
         else:
             return ChatCompletionsClient(
-                endpoint=model_config.endpoint,
+                endpoint=model_configuration.endpoint,
                 credential=azure_credential
             )
     
@@ -84,9 +84,9 @@ class ClientFactory:
         """Create a client from a routing result"""
         
         if client_type.lower() == "openai":
-            return ClientFactory.create_openai_client(result.model_config, async_client)
+            return ClientFactory.create_openai_client(result.model_configuration, async_client)
         elif client_type.lower() == "inference":
-            return ClientFactory.create_inference_client(result.model_config, async_client)
+            return ClientFactory.create_inference_client(result.model_configuration, async_client)
         else:
             raise ConfigurationError(f"Unsupported client type: {client_type}")
 
@@ -97,18 +97,18 @@ class ConfiguredClient:
     def __init__(
         self,
         client: Union[AsyncAzureOpenAI, AzureOpenAI, AsyncChatCompletionsClient, ChatCompletionsClient],
-        model_config: ModelConfig,
+        model_configuration: ModelConfig,
         routing_result: RoutingResult
     ):
         self.client = client
-        self.model_config = model_config
+        self.model_configuration = model_configuration
         self.routing_result = routing_result
     
     @property
     def deployment_name(self) -> str:
         """Get the deployment name for API calls"""
-        return self.model_config.deployment_name
-    
+        return self.model_configuration.deployment_name
+
     @property
     def is_async(self) -> bool:
         """Check if this is an async client"""
@@ -120,13 +120,13 @@ class ConfiguredClient:
         # Set default parameters from model config
         if "model" not in kwargs:
             kwargs["model"] = self.deployment_name
-        
-        if "temperature" not in kwargs and self.model_config.temperature is not None:
-            kwargs["temperature"] = self.model_config.temperature
-        
-        if "max_tokens" not in kwargs and self.model_config.max_tokens is not None:
-            kwargs["max_tokens"] = self.model_config.max_tokens
-        
+
+        if "temperature" not in kwargs and self.model_configuration.temperature is not None:
+            kwargs["temperature"] = self.model_configuration.temperature
+
+        if "max_tokens" not in kwargs and self.model_configuration.max_tokens is not None:
+            kwargs["max_tokens"] = self.model_configuration.max_tokens
+
         # Call the appropriate method based on client type
         if isinstance(self.client, (AsyncAzureOpenAI, AzureOpenAI)):
             if self.is_async:
@@ -148,7 +148,7 @@ class ConfiguredClient:
         return {
             "model_name": self.routing_result.model_name,
             "deployment_name": self.deployment_name,
-            "endpoint": self.model_config.endpoint,
+            "endpoint": self.model_configuration.endpoint,
             "client_type": type(self.client).__name__,
             "is_async": self.is_async,
             "use_case": self.routing_result.use_case.name if self.routing_result.use_case else None,

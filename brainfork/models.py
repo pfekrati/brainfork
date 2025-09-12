@@ -56,7 +56,7 @@ class RoutingResult(BaseModel):
 class ConfiguredClient(BaseModel):
     """A configured Azure OpenAI client with its model config."""
     client: AsyncAzureOpenAI
-    model_config: ModelConfig
+    model_configuration: ModelConfig
 
     class Config:
         arbitrary_types_allowed = True

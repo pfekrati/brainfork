@@ -55,23 +55,23 @@ class ModelRouter:
             if use_case.model_name not in self.models:
                 raise ValueError(f"Model '{use_case.model_name}' in use case '{use_case.name}' not found in models")
     
-    async def _get_client(self, model_config: ModelConfig) -> AsyncAzureOpenAI:
+    async def _get_client(self, model_configuration: ModelConfig) -> AsyncAzureOpenAI:
         """Get an authenticated Azure OpenAI client."""
-        auth = model_config.auth
+        auth = model_configuration.auth
         
         if auth.api_key:
             return AsyncAzureOpenAI(
                 api_key=auth.api_key,
-                azure_endpoint=model_config.endpoint,
-                api_version=model_config.api_version
+                azure_endpoint=model_configuration.endpoint,
+                api_version=model_configuration.api_version
             )
         elif auth.use_managed_identity:
             credential = DefaultAzureCredential()
             token = await credential.get_token("https://cognitiveservices.azure.com/.default")
             return AsyncAzureOpenAI(
                 azure_ad_token=token.token,
-                azure_endpoint=model_config.endpoint,
-                api_version=model_config.api_version
+                azure_endpoint=model_configuration.endpoint,
+                api_version=model_configuration.api_version
             )
         elif auth.client_id and auth.client_secret and auth.tenant_id:
             credential = ClientSecretCredential(
@@ -82,8 +82,8 @@ class ModelRouter:
             token = await credential.get_token("https://cognitiveservices.azure.com/.default")
             return AsyncAzureOpenAI(
                 azure_ad_token=token.token,
-                azure_endpoint=model_config.endpoint,
-                api_version=model_config.api_version
+                azure_endpoint=model_configuration.endpoint,
+                api_version=model_configuration.api_version
             )
         else:
             raise ValueError("No valid authentication method provided")
@@ -150,7 +150,7 @@ class ModelRouter:
         
         return ConfiguredClient(
             client=client,
-            model_config=routing_result.selected_model
+            model_configuration=routing_result.selected_model
         )
     
     def get_model_info(self) -> Dict:

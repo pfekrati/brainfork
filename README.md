@@ -102,7 +102,7 @@ async def main():
     # Get a configured client and make API call
     configured_client = await router.get_configured_client(messages)
     response = await configured_client.client.chat.completions.create(
-        model=configured_client.model_config.deployment_name,
+        model=configured_client.model_configuration.deployment_name,
         messages=messages,
         max_completion_tokens=1000
     )

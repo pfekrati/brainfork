@@ -178,7 +178,7 @@ async def main():
         print(f"🤖 Selected Model: {result.model_name}")
         print(f"📊 Confidence: {result.confidence:.3f}")
         print(f"🎯 Use Case: {result.use_case.name if result.use_case else 'Default'}")
-        print(f"🔐 Auth Type: {result.model_config.auth.auth_type.value}")
+        print(f"🔐 Auth Type: {result.model_configuration.auth.auth_type.value}")
         print(f"💭 Reasoning: {result.reasoning[:100]}...")
         
         # Test different override scenarios

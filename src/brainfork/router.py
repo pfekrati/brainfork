@@ -142,7 +142,7 @@ class ModelRouter:
         
         return ConfiguredClient(
             client=client,
-            model_config=routing_result.selected_model,
+            model_configuration=routing_result.selected_model,
             routing_result=routing_result
         )
     

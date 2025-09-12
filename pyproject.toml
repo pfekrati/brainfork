@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "brainfork"
-version = "0.1.0"
+version = "0.1.1"
 description = "An intelligent AI model router for Azure OpenAI that automatically selects the best model for your specific use case"
 readme = "README.md"
 license = {text = "MIT"}
